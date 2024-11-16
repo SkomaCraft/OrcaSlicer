@@ -254,6 +254,12 @@ if(FLATPAK)
     find_package(CURL)
 endif()
 
+set(FreeGLUT_PKG "")
+if (NOT FreeGLUT_FOUND) 
+    include(FreeGLUT/FreeGLUT.cmake)
+    set(FreeGLUT_PKG dep_FreeGLUT)
+endif ()
+
 set(ZLIB_PKG "")
 if (NOT ZLIB_FOUND) 
     include(ZLIB/ZLIB.cmake)
@@ -345,6 +351,7 @@ include(OpenCV/OpenCV.cmake)
 set(_dep_list
     dep_Boost
     dep_TBB
+    ${FreeGLUT_PKG}
     ${OPENSSL_PKG}
     ${CURL_PKG}
     ${WXWIDGETS_PKG}
