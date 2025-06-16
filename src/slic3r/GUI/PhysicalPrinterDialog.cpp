@@ -583,7 +583,18 @@ void PhysicalPrinterDialog::update(bool printer_change)
             m_optgroup->show_field("printhost_apikey", auth_type == AuthorizationType::atKeyPassword);
             for (const char* opt_key : { "printhost_user", "printhost_password" })
                 m_optgroup->show_field(opt_key, auth_type == AuthorizationType::atUserPassword); 
-        } else {
+        } 
+        else if (opt->value == htCraftbot) {
+            m_optgroup->hide_field("printhost_authorization_type");
+            m_optgroup->hide_field("print_host_webui");
+            m_optgroup->hide_field("printhost_cafile");
+            m_optgroup->hide_field("printhost_ssl_ignore_revoke");
+            m_optgroup->hide_field("printhost_apikey");
+
+            m_optgroup->show_field("printhost_user");
+            m_optgroup->show_field("printhost_password");
+        }
+        else {
             m_optgroup->hide_field("printhost_authorization_type");
             m_optgroup->show_field("printhost_apikey", true);
             for (const std::string& opt_key : std::vector<std::string>{ "printhost_user", "printhost_password" })

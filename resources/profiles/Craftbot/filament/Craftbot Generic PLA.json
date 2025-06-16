@@ -1,0 +1,41 @@
+{
+    "type": "filament",
+    "filament_id": "GFL99",
+    "setting_id": "GFSA04",
+    "name": "Craftbot Generic PLA",
+    "from": "system",
+    "instantiation": "true",
+    "inherits": "fdm_filament_pla",
+    "filament_flow_ratio": [
+        "1.0"
+    ],
+    "filament_max_volumetric_speed": [
+        "12"
+    ],
+    "slow_down_layer_time": [
+        "8"
+    ],
+    "compatible_printers": [
+        "Craftbot Flow 0.25 nozzle",
+        "Craftbot Flow 0.4 nozzle",
+        "Craftbot Flow 0.6 nozzle",
+        "Craftbot Flow 0.8 nozzle",
+        "Craftbot Flow XL 0.25 nozzle",
+        "Craftbot Flow XL 0.4 nozzle",
+        "Craftbot Flow XL 0.6 nozzle",
+        "Craftbot Flow XL 0.8 nozzle",
+        "Craftbot Flow IDEX 0.25 nozzle",
+        "Craftbot Flow IDEX 0.4 nozzle",
+        "Craftbot Flow IDEX 0.6 nozzle",
+        "Craftbot Flow IDEX 0.8 nozzle",
+        "Craftbot Flow IDEX XL 0.25 nozzle",
+        "Craftbot Flow IDEX XL 0.4 nozzle",
+        "Craftbot Flow IDEX XL 0.6 nozzle",
+        "Craftbot Flow IDEX XL 0.8 nozzle",
+        "Craftbot Flow Wide XL 0.25 nozzle",
+        "Craftbot Flow Wide XL 0.4 nozzle",
+        "Craftbot Flow Wide XL 0.6 nozzle",
+        "Craftbot Flow Wide XL 0.8 nozzle"
+     ]
+}
+  

@@ -30,7 +30,7 @@
 namespace Slic3r {
 
 enum GCodeFlavor : unsigned char {
-    gcfMarlinLegacy, gcfKlipper, gcfRepRapFirmware, gcfMarlinFirmware, gcfRepRapSprinter, gcfRepetier, gcfTeacup, gcfMakerWare, gcfSailfish, gcfMach3, gcfMachinekit,
+    gcfMarlinLegacy, gcfCraftbot, gcfKlipper, gcfRepRapFirmware, gcfMarlinFirmware, gcfRepRapSprinter, gcfRepetier, gcfTeacup, gcfMakerWare, gcfSailfish, gcfMach3, gcfMachinekit,
     gcfSmoothie, gcfNoExtrusion
 };
 
@@ -50,7 +50,7 @@ enum class NoiseType {
 };
 
 enum PrintHostType {
-    htPrusaLink, htPrusaConnect, htOctoPrint, htDuet, htFlashAir, htAstroBox, htRepetier, htMKS, htESP3D, htCrealityPrint, htObico, htFlashforge, htSimplyPrint, htElegooLink
+    htPrusaLink, htPrusaConnect, htOctoPrint, htDuet, htFlashAir, htAstroBox, htRepetier, htMKS, htESP3D, htCrealityPrint, htObico, htFlashforge, htSimplyPrint, htElegooLink, htCraftbot,
 };
 
 enum AuthorizationType {
@@ -70,6 +70,13 @@ enum class IroningType {
     TopmostOnly,
     AllSolid,
     Count,
+};
+
+enum class DualExtruderMode {
+    Normal,
+    Parallel,
+    Mirror,
+    Backup
 };
 
 //BBS
@@ -1329,8 +1336,10 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionFloat,              wipe_tower_max_purge_speed))
     ((ConfigOptionInt,                wipe_tower_filament))
     ((ConfigOptionFloats,             wiping_volumes_extruders))
-    ((ConfigOptionInts,       idle_temperature))
+    ((ConfigOptionInts,               idle_temperature))
 
+    //Craftbot Print Mode
+    ((ConfigOptionEnum<DualExtruderMode>, dual_extruder_mode))
 
     // BBS: wipe tower is only used for priming
     ((ConfigOptionFloat,              prime_volume))

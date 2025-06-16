@@ -2178,6 +2178,8 @@ bool GCodeProcessor::process_cura_tags(const std::string_view comment)
             m_flavor = gcfRepRapFirmware;
         else if (flavor == "Marlin")
             m_flavor = gcfMarlinLegacy;
+        else if (flavor == "Craftbot")
+            m_flavor = gcfCraftbot;
         else
             BOOST_LOG_TRIVIAL(warning) << "GCodeProcessor found unknown flavor: " << flavor;
 

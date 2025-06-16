@@ -1,0 +1,24 @@
+{
+  "type": "machine",
+  "setting_id": "CB002",
+  "name": "Craftbot Flow IDEX 0.6 nozzle",
+  "from": "system",
+  "instantiation": "true",
+  "inherits": "fdm_craftbot_flow_left_060_common",
+  "printer_model": "Craftbot Flow IDEX",
+  "single_extruder_multi_material": "0",
+  "printable_area": [
+      "0x0",
+      "425x0",
+      "425x250",
+      "0x250"
+  ],
+  "bed_exclude_area": [
+      "386x0",
+      "425x0",
+      "425x250",
+      "386x250"
+  ],
+  "change_filament_gcode": ";CHANGE_FILAMENT\nT{next_extruder}\nG92 E0\n",
+  "printable_height": "250"
+}

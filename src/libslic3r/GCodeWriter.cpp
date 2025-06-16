@@ -16,6 +16,8 @@
 
 namespace Slic3r {
 
+bool GCodeFormatter::emit_leading_zeros = false;
+
 bool GCodeWriter::full_gcode_comment = true;
 
 bool GCodeWriter::supports_separate_travel_acceleration(GCodeFlavor flavor)
@@ -28,7 +30,7 @@ void GCodeWriter::apply_print_config(const PrintConfig &print_config)
     this->config.apply(print_config, true);
     m_single_extruder_multi_material = print_config.single_extruder_multi_material.value;
     bool use_mach_limits = print_config.gcode_flavor.value == gcfMarlinLegacy || print_config.gcode_flavor.value == gcfMarlinFirmware ||
-                           print_config.gcode_flavor.value == gcfKlipper || print_config.gcode_flavor.value == gcfRepRapFirmware;
+                           print_config.gcode_flavor.value == gcfKlipper || print_config.gcode_flavor.value == gcfRepRapFirmware || print_config.gcode_flavor.value==gcfCraftbot;
     m_max_acceleration = std::lrint(use_mach_limits ? print_config.machine_max_acceleration_extruding.values.front() : 0);
     m_max_travel_acceleration = static_cast<unsigned int>(
         std::round((use_mach_limits && supports_separate_travel_acceleration(print_config.gcode_flavor.value)) ?
@@ -41,6 +43,10 @@ void GCodeWriter::apply_print_config(const PrintConfig &print_config)
     };
     m_max_jerk_z = print_config.machine_max_jerk_z.values.front();
     m_max_jerk_e = print_config.machine_max_jerk_e.values.front();
+
+    m_emit_leading_zeros = (print_config.gcode_flavor.value == gcfCraftbot);
+    GCodeFormatter::addLeadingZeros(m_emit_leading_zeros);
+     
 }
 
 void GCodeWriter::set_extruders(std::vector<unsigned int> extruder_ids)
@@ -73,7 +79,8 @@ std::string GCodeWriter::preamble()
         FLAVOR_IS(gcfTeacup) ||
         FLAVOR_IS(gcfRepetier) ||
         FLAVOR_IS(gcfSmoothie) ||
-        FLAVOR_IS(gcfKlipper))
+        FLAVOR_IS(gcfKlipper) || 
+        FLAVOR_IS(gcfCraftbot))
     {
         if (this->config.use_relative_e_distances) {
             gcode << "M83 ; use relative distances for extrusion\n";
@@ -190,6 +197,27 @@ std::string GCodeWriter::set_chamber_temperature(int temperature, bool wait)
         gcode << code << " S" << temperature << ";" << comment << "\n";
     }
     return gcode.str();
+}
+
+std::string GCodeWriter::set_dual_print_mode(DualExtruderMode mode, GCodeFlavor flavor, bool is_single_head)
+{
+    
+    switch (mode) {
+        case DualExtruderMode::Parallel: 
+             return "M9006 S2\n";
+        case DualExtruderMode::Mirror: 
+             return "M9006 S1\n";
+        case DualExtruderMode::Backup: 
+             return "M9006 S6\n";
+        case DualExtruderMode::Normal:
+    default:
+        {
+            if (flavor == gcfCraftbot && !is_single_head) 
+                return "M9006 S0\n";     
+        }
+    }
+    
+    return std::string();
 }
 
 // copied from PrusaSlicer
@@ -980,7 +1008,8 @@ void GCodeWriter::add_object_change_labels(std::string& gcode)
     add_object_start_labels(gcode);
 }
 
-void GCodeFormatter::emit_axis(const char axis, const double v, size_t digits) {
+void GCodeFormatter::emit_axis(const char axis, const double v, size_t digits)
+{
     assert(digits <= 9);
     static constexpr const std::array<int, 10> pow_10{1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
     *ptr_err.ptr++ = ' '; *ptr_err.ptr++ = axis;
@@ -1006,10 +1035,18 @@ void GCodeFormatter::emit_axis(const char axis, const double v, size_t digits) {
         memset(this->ptr_err.ptr - writen_digits, '0', remaining_digits);
         this->ptr_err.ptr += remaining_digits;
     }
-
+    // Move all newly inserted chars by one to allocate space for a leading zero and one for decima point.
+    if (emit_leading_zeros && v<1 && v>-1) {
+        for (char *to_ptr = ++this->ptr_err.ptr, *from_ptr = to_ptr - 2; from_ptr >= this->ptr_err.ptr - digits - 1; --to_ptr, --from_ptr)
+            *to_ptr = *from_ptr;
+        *(ptr_err.ptr - digits - 1) = '0';
+    }
+    else
+    {
     // Move all newly inserted chars by one to allocate space for a decimal point.
     for (char *to_ptr = this->ptr_err.ptr, *from_ptr = to_ptr - 1; from_ptr >= this->ptr_err.ptr - digits; --to_ptr, --from_ptr)
         *to_ptr = *from_ptr;
+    }
 
     *(this->ptr_err.ptr - digits) = '.';
     for (size_t i = 0; i < digits; ++i) {

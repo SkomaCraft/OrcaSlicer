@@ -543,6 +543,8 @@ set(SLIC3R_GUI_SOURCES
     Utils/MKS.hpp
     Utils/ESP3D.cpp
     Utils/ESP3D.hpp
+    Utils/CraftbotLink.cpp
+    Utils/CraftbotLink.hpp
     Utils/CrealityPrint.cpp
     Utils/CrealityPrint.hpp
     Utils/WxFontUtils.cpp

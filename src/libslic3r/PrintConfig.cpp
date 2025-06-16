@@ -91,7 +91,8 @@ static t_config_enum_values s_keys_map_PrintHostType {
     { "obico",          htObico },
     { "flashforge",     htFlashforge },
     { "simplyprint",    htSimplyPrint },
-    { "elegoolink",     htElegooLink }
+    { "elegoolink",     htElegooLink },
+    { "craftbot",       htCraftbot},
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(PrintHostType)
 
@@ -114,7 +115,8 @@ static t_config_enum_values s_keys_map_GCodeFlavor {
     { "smoothie",       gcfSmoothie },
     { "mach3",          gcfMach3 },
     { "machinekit",     gcfMachinekit },
-    { "no-extrusion",   gcfNoExtrusion }
+    { "no-extrusion",   gcfNoExtrusion },
+    { "craftbot",       gcfCraftbot}
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(GCodeFlavor)
 
@@ -169,6 +171,14 @@ static t_config_enum_values s_keys_map_IroningType {
     { "solid",          int(IroningType::AllSolid) }
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(IroningType)
+
+static t_config_enum_values s_keys_map_DualExtruderMode{
+    {"normal", int(DualExtruderMode ::Normal)},
+    {"parallel", int(DualExtruderMode ::Parallel)},
+    {"mirror", int(DualExtruderMode ::Mirror)},
+    {"backup", int(DualExtruderMode ::Backup)}
+};
+CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(DualExtruderMode)
 
 //BBS
 static t_config_enum_values s_keys_map_WallInfillOrder {
@@ -3008,6 +3018,7 @@ void PrintConfigDef::init_fff_params()
     def->tooltip = L("What kind of G-code the printer is compatible with.");
     def->enum_keys_map = &ConfigOptionEnum<GCodeFlavor>::get_enum_values();
     def->enum_values.push_back("marlin");
+    def->enum_values.push_back("craftbot");
     def->enum_values.push_back("klipper");
     def->enum_values.push_back("reprapfirmware");
     //def->enum_values.push_back("repetier");
@@ -3020,6 +3031,7 @@ void PrintConfigDef::init_fff_params()
     //def->enum_values.push_back("smoothie");
     //def->enum_values.push_back("no-extrusion");
     def->enum_labels.push_back("Marlin(legacy)");
+    def->enum_labels.push_back("Craftbot");
     def->enum_labels.push_back(L("Klipper"));
     def->enum_labels.push_back("RepRapFirmware");
     //def->enum_labels.push_back("RepRap/Sprinter");
@@ -3092,7 +3104,6 @@ void PrintConfigDef::init_fff_params()
     def->min = 0;
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionFloatOrPercent(100., true));
-
     def = this->add("sparse_infill_filament", coInt);
     def->gui_type = ConfigOptionDef::GUIType::i_enum_open;
     def->label = L("Infill");
@@ -3666,6 +3677,7 @@ void PrintConfigDef::init_fff_params()
     def->enum_values.push_back("flashforge");
     def->enum_values.push_back("simplyprint");
     def->enum_values.push_back("elegoolink");
+    def->enum_values.push_back("craftbot");
     def->enum_labels.push_back("PrusaLink");
     def->enum_labels.push_back("PrusaConnect");
     def->enum_labels.push_back("Octo/Klipper");
@@ -3680,6 +3692,7 @@ void PrintConfigDef::init_fff_params()
     def->enum_labels.push_back("Flashforge");
     def->enum_labels.push_back("SimplyPrint");
     def->enum_labels.push_back("Elegoo Link");
+    def->enum_labels.push_back("Craftbot");
     def->mode = comAdvanced;
     def->cli = ConfigOptionDef::nocli;
     def->set_default_value(new ConfigOptionEnum<PrintHostType>(htOctoPrint));
@@ -5419,6 +5432,24 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionInt(0));
 
+    def = this->add("dual_extruder_mode", coEnum);
+    def->label    = L("Dual extruder mode");
+    def->category      = L("Extruders");
+    def->tooltip  = L("Print Mode Selector...");
+    def->enum_keys_map = &ConfigOptionEnum<DualExtruderMode>::get_enum_values();
+    def->enum_values.push_back("normal");
+    def->enum_values.push_back("parallel");
+    def->enum_values.push_back("mirror");
+    def->enum_values.push_back("backup");
+    def->enum_labels.push_back(L("Normal"));
+    def->enum_labels.push_back(L("Parallel"));
+    def->enum_labels.push_back(L("Mirror"));
+    def->enum_labels.push_back(L("Backup"));
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionEnum<DualExtruderMode>(DualExtruderMode::Normal));
+
+
+
     def = this->add("wiping_volumes_extruders", coFloats);
     def->label = L("Purging volumes - load/unload volumes");
     def->tooltip = L("This vector saves required volumes to change from/to each tool used on the "
@@ -7068,7 +7099,8 @@ std::map<std::string, std::string> validate(const FullPrintConfig &cfg, bool und
         cfg.gcode_flavor.value != gcfMarlinLegacy &&
         cfg.gcode_flavor.value != gcfMarlinFirmware &&
         cfg.gcode_flavor.value != gcfMachinekit &&
-        cfg.gcode_flavor.value != gcfRepetier)
+        cfg.gcode_flavor.value != gcfRepetier &&
+        cfg.gcode_flavor.value != gcfCraftbot)
         error_message.emplace("use_firmware_retraction","--use-firmware-retraction is only supported by Klipper, Marlin, Smoothie, RepRapFirmware, Repetier and Machinekit firmware");
 
     if (cfg.use_firmware_retraction.value)

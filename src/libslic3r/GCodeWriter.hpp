@@ -24,8 +24,7 @@ public:
         m_last_bed_temperature(0), m_last_bed_temperature_reached(true),
         m_lifted(0),
         m_to_lift(0),
-        m_to_lift_type(LiftType::NormalLift),
-        m_current_speed(3600), m_is_first_layer(true)
+        m_to_lift_type(LiftType::NormalLift), m_current_speed(3600), m_is_first_layer(true), m_emit_leading_zeros(true)
         {}
     Extruder*            extruder()             { return m_extruder; }
     const Extruder*      extruder()     const   { return m_extruder; }
@@ -48,6 +47,7 @@ public:
     std::string set_temperature(unsigned int temperature, bool wait = false, int tool = -1) const;
     std::string set_bed_temperature(int temperature, bool wait = false);
     std::string set_chamber_temperature(int temperature, bool wait = false);
+    std::string set_dual_print_mode(DualExtruderMode mode, GCodeFlavor flavor, bool is_single_head);
     std::string set_print_acceleration(unsigned int acceleration)   { return set_acceleration_internal(Acceleration::Print, acceleration); }
     std::string set_travel_acceleration(unsigned int acceleration)  { return set_acceleration_internal(Acceleration::Travel, acceleration); }
     std::string set_jerk_xy(double jerk);
@@ -143,6 +143,8 @@ public:
     unsigned int  m_travel_acceleration;
     unsigned int  m_travel_jerk;
 
+    // Emit Leading Zeros
+    bool            m_emit_leading_zeros;
 
     //BBS
     unsigned int    m_last_additional_fan_speed;
@@ -191,7 +193,7 @@ public:
 
     GCodeFormatter(const GCodeFormatter&) = delete;
     GCodeFormatter& operator=(const GCodeFormatter&) = delete;
-
+   
     // At layer height 0.15mm, extrusion width 0.2mm and filament diameter 1.75mm,
     // the crossection of extrusion is 0.4 * 0.15 = 0.06mm2
     // and the filament crossection is 1.75^2 = 3.063mm2
@@ -262,12 +264,14 @@ public:
         *ptr_err.ptr ++ = '\n';
         return std::string(this->buf, ptr_err.ptr - buf);
     }
+    static void addLeadingZeros(bool enable) { emit_leading_zeros = enable; }
 
 protected:
     static constexpr const size_t   buflen = 256;
     char                            buf[buflen];
     char* buf_end;
     std::to_chars_result            ptr_err;
+    static bool                     emit_leading_zeros;
 };
 
 class GCodeG1Formatter : public GCodeFormatter {
