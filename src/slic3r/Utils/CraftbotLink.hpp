@@ -38,10 +38,10 @@ private:
     std::string m_host;
     std::string m_username;
     std::string m_password;
-
-    bool        send_file(const PrintHostUpload& upload_data, ProgressFn progress_fn, ErrorFn error_fn, InfoFn info_fn) const;
-    std::string calc_sha256(const std::string& str) const;
-    std::string base64_encode(const std::string& input) const;
+    bool                       start_print(wxString& msg, const std::string& filename) const;
+    bool                       send_file(const PrintHostUpload& upload_data, ProgressFn progress_fn, ErrorFn error_fn, InfoFn info_fn) const;
+    std::string                calc_sha256(const std::string& str) const;
+    std::string                base64_encode(const std::string& input) const;
 };
 
 } // namespace Slic3r

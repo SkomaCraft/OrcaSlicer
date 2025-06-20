@@ -2383,7 +2383,7 @@ void GCode::_do_export(Print& print, GCodeOutputStream &file, ThumbnailsGenerato
     // Write the custom start G-code
     file.writeln(machine_start_gcode);
 
-    file.write(m_writer.set_dual_print_mode(m_config.dual_extruder_mode,m_config.gcode_flavor,m_config.single_extruder_multi_material));
+    //file.write(m_writer.set_dual_print_mode(m_config.dual_print_mode,m_config.gcode_flavor, m_config.single_extruder_multi_material));
 
     //BBS: gcode writer doesn't know where the real position of extruder is after inserting custom gcode
     m_writer.set_current_position_clear(false);

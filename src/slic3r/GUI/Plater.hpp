@@ -154,6 +154,7 @@ public:
     void add_custom_filament(wxColour new_col);
     // BBS
     void on_bed_type_change(BedType bed_type);
+    void on_dual_mode_change(DualPrintMode mode);
     void load_ams_list(std::string const & device, MachineObject* obj);
     std::map<int, DynamicPrintConfig> build_filament_ams_list(MachineObject* obj);
     void sync_ams_list();
@@ -205,6 +206,8 @@ private:
 
     wxBoxSizer* m_scrolled_sizer = nullptr;
     ComboBox* m_bed_type_list = nullptr;
+    ComboBox* m_dual_mode_list = nullptr;
+    wxStaticText*   dual_mode_title  = nullptr;
     ScalableButton* connection_btn = nullptr;
     ScalableButton* ams_btn = nullptr;
 };

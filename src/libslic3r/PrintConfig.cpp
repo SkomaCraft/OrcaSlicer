@@ -172,13 +172,13 @@ static t_config_enum_values s_keys_map_IroningType {
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(IroningType)
 
-static t_config_enum_values s_keys_map_DualExtruderMode{
-    {"normal", int(DualExtruderMode ::Normal)},
-    {"parallel", int(DualExtruderMode ::Parallel)},
-    {"mirror", int(DualExtruderMode ::Mirror)},
-    {"backup", int(DualExtruderMode ::Backup)}
+static t_config_enum_values s_keys_map_DualPrintMode{
+    {"normal",   int(DualPrintMode ::Normal)},
+    {"parallel", int(DualPrintMode ::Parallel)},
+    {"mirror",   int(DualPrintMode ::Mirror)},
+    {"backup",   int(DualPrintMode ::Backup)}
 };
-CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(DualExtruderMode)
+CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(DualPrintMode)
 
 //BBS
 static t_config_enum_values s_keys_map_WallInfillOrder {
@@ -5432,24 +5432,6 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionInt(0));
 
-    def = this->add("dual_extruder_mode", coEnum);
-    def->label    = L("Dual extruder mode");
-    def->category      = L("Extruders");
-    def->tooltip  = L("Print Mode Selector...");
-    def->enum_keys_map = &ConfigOptionEnum<DualExtruderMode>::get_enum_values();
-    def->enum_values.push_back("normal");
-    def->enum_values.push_back("parallel");
-    def->enum_values.push_back("mirror");
-    def->enum_values.push_back("backup");
-    def->enum_labels.push_back(L("Normal"));
-    def->enum_labels.push_back(L("Parallel"));
-    def->enum_labels.push_back(L("Mirror"));
-    def->enum_labels.push_back(L("Backup"));
-    def->mode = comAdvanced;
-    def->set_default_value(new ConfigOptionEnum<DualExtruderMode>(DualExtruderMode::Normal));
-
-
-
     def = this->add("wiping_volumes_extruders", coFloats);
     def->label = L("Purging volumes - load/unload volumes");
     def->tooltip = L("This vector saves required volumes to change from/to each tool used on the "
@@ -6462,6 +6444,20 @@ void PrintConfigDef::init_sla_params()
     def->enum_labels.push_back(" ");
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionEnum<SLAMaterialSpeed>(slamsFast));
+
+    def = this->add("dual_print_mode", coEnum);
+    def->enum_keys_map = &ConfigOptionEnum<DualPrintMode>::get_enum_values();
+    def->enum_values.push_back("normal");
+    def->enum_values.push_back("parallel");
+    def->enum_values.push_back("mirror");
+    def->enum_values.push_back("backup");
+    def->enum_labels.push_back(L("Normal"));
+    def->enum_labels.push_back(L("Parallel"));
+    def->enum_labels.push_back(L("Mirror"));
+    def->enum_labels.push_back(L("Backup"));
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionEnum<DualPrintMode>(DualPrintMode::Normal));
+
 }
 
 void PrintConfigDef::handle_legacy(t_config_option_key &opt_key, std::string &value)

@@ -199,17 +199,17 @@ std::string GCodeWriter::set_chamber_temperature(int temperature, bool wait)
     return gcode.str();
 }
 
-std::string GCodeWriter::set_dual_print_mode(DualExtruderMode mode, GCodeFlavor flavor, bool is_single_head)
+std::string GCodeWriter::set_dual_print_mode(DualPrintMode mode, GCodeFlavor flavor, bool is_single_head)
 {
     
     switch (mode) {
-        case DualExtruderMode::Parallel: 
+        case DualPrintMode::Parallel: 
              return "M9006 S2\n";
-        case DualExtruderMode::Mirror: 
+        case DualPrintMode::Mirror: 
              return "M9006 S1\n";
-        case DualExtruderMode::Backup: 
+        case DualPrintMode::Backup: 
              return "M9006 S6\n";
-        case DualExtruderMode::Normal:
+        case DualPrintMode::Normal:
     default:
         {
             if (flavor == gcfCraftbot && !is_single_head) 
@@ -250,6 +250,10 @@ std::string GCodeWriter::set_acceleration_internal(Acceleration type, unsigned i
             if (GCodeWriter::full_gcode_comment)
                 gcode << " ; adjust ACCEL_TO_DECEL";
         }
+    }
+    else if (FLAVOR_IS(gcfCraftbot))
+    {
+        gcode << "M1203 A" << acceleration << " D" << acceleration;
     }
     else
         gcode << "M204 S" << acceleration;

@@ -421,6 +421,9 @@ void AppConfig::set_defaults()
     if (get("is_split_compound").empty()) {
         set_bool("is_split_compound", false);
     }
+    if (get("dual_print_mode").empty()) {
+        set("dual_print_mode", "normal");
+    }
 
     // Remove legacy window positions/sizes
     erase("app", "main_frame_maximized");

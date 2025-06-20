@@ -72,11 +72,11 @@ enum class IroningType {
     Count,
 };
 
-enum class DualExtruderMode {
+enum class DualPrintMode {
     Normal,
     Parallel,
     Mirror,
-    Backup
+    Backup,
 };
 
 //BBS
@@ -1338,8 +1338,6 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionFloats,             wiping_volumes_extruders))
     ((ConfigOptionInts,               idle_temperature))
 
-    //Craftbot Print Mode
-    ((ConfigOptionEnum<DualExtruderMode>, dual_extruder_mode))
 
     // BBS: wipe tower is only used for priming
     ((ConfigOptionFloat,              prime_volume))
@@ -1378,7 +1376,8 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionPoint,               bed_mesh_probe_distance))
     ((ConfigOptionFloat,               adaptive_bed_mesh_margin))
 
-
+    // Craftbot Print Mode
+    ((ConfigOptionEnum<DualPrintMode>, dual_print_mode))
 )
 
 // This object is mapped to Perl as Slic3r::Config::Full.

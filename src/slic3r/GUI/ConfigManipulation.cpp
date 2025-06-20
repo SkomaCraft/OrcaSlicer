@@ -683,9 +683,7 @@ void ConfigManipulation::toggle_print_fff_options(DynamicPrintConfig *config, co
         toggle_line(el, !bSEMM);
 
 
-    auto extruderCNT = wxGetApp().preset_bundle->filament_presets.size() ; // config->opt_int("num_extruders");
-
-    toggle_line("dual_extruder_mode", gcflavor == gcfCraftbot && extruderCNT>1);
+  
     bool purge_in_primetower = preset_bundle->printers.get_edited_preset().config.opt_bool("purge_in_prime_tower");
 
     for (auto el : {"wipe_tower_rotation_angle", "wipe_tower_cone_angle",

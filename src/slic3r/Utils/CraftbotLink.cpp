@@ -63,7 +63,6 @@ bool CraftbotLink::upload(PrintHostUpload upload_data, ProgressFn progress_fn, E
 }
 bool CraftbotLink::send_file(const PrintHostUpload& upload_data, ProgressFn progress_fn, ErrorFn error_fn, InfoFn info_fn) const
 {
-    // ---- AUTH: Craftbot-style (double SHA + base64) ----
     std::string pwd_sha   = calc_sha256("flow_admin_" + m_password);
     std::string final_sha = calc_sha256("-" + m_username + "-" + pwd_sha + "-");
     std::string auth      = base64_encode(m_username + ":" + final_sha);
@@ -78,9 +77,8 @@ bool CraftbotLink::send_file(const PrintHostUpload& upload_data, ProgressFn prog
 
     BOOST_LOG_TRIVIAL(info) << "Craftbot: Read " << data.size() << " bytes for upload.";
 
-    // Override default headers BEFORE creating request
     Http::set_extra_headers({
-        {"User-Agent", "CraftWare"} // must be before request
+        {"User-Agent", "CraftWare"} 
     });
 
     const std::string url  = "http://" + m_host + "/remoteupload";
@@ -90,11 +88,10 @@ bool CraftbotLink::send_file(const PrintHostUpload& upload_data, ProgressFn prog
 
 
     http.header("Content-Type", "application/octet-stream");
-    http.header("Content-Length", std::to_string(data.size())); // ADD THIS IN ORDER
+    http.header("Content-Length", std::to_string(data.size())); 
     http.header("Name", upload_data.upload_path.filename().string());
     http.header("Authorization", "Basic " + auth);
-    http.header("User-Agent", "CraftWare"); // just to be sure
-    http.header("Host", m_host);            // manually set it too
+    http.header("Host", m_host);
     http.header("Cache-Control", "no-cache");
 
     // Set POST body
@@ -123,9 +120,59 @@ bool CraftbotLink::send_file(const PrintHostUpload& upload_data, ProgressFn prog
 
     http.perform_sync();
 
+    if (success && upload_data.post_action == PrintHostPostUploadAction::StartPrint)
+    {
+        wxString errormsg;
+        success = start_print(errormsg, upload_data.upload_path.string());
+        if (!success) {
+            error_fn(std::move(errormsg));
+        }
+    }
     return success;
 }
 
+
+bool  CraftbotLink::start_print(wxString& msg, const std::string& filename) const
+{
+    std::string pwd_sha   = calc_sha256("flow_admin_" + m_password);
+    std::string final_sha = calc_sha256("-" + m_username + "-" + pwd_sha + "-");
+    std::string auth      = base64_encode(m_username + ":" + final_sha);
+
+    Http::set_extra_headers({{"User-Agent", "CraftWare"}});
+
+    const std::string url  = "http://" + m_host + "/remotestartprint";
+    auto              http = Http::post(url);
+
+    http.remove_header("Accept");
+
+    http.header("Content-Type", "application/json");
+    http.header("Authorization", "Basic " + auth);
+    http.header("Host", m_host);
+    http.header("Cache-Control", "no-cache");
+
+    // JSON body with filename
+    std::ostringstream json;
+    json << "{ \"fileName\": \"" << filename << "\" }";
+    http.set_post_body(json.str());
+
+
+    bool success = true;
+
+   http.on_error([&](std::string body, std::string error, unsigned status) {
+        BOOST_LOG_TRIVIAL(error) << "Craftbot: Start print failed. HTTP " << status << ", error: " << error << ", body: " << body;
+        msg     = wxString::Format("Craftbot: Failed to start print. HTTP %u - %s", status, error);
+        success = false;
+    });
+
+    http.on_complete([&](std::string body, unsigned status) {
+        BOOST_LOG_TRIVIAL(info) << "Craftbot: Start print succeeded. HTTP " << status;
+        msg = "Craftbot: Print started successfully.";
+    });
+
+    http.perform_sync();
+
+    return success;
+} 
 
 std::string CraftbotLink::calc_sha256(const std::string& input) const
 {

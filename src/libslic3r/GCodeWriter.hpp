@@ -47,7 +47,7 @@ public:
     std::string set_temperature(unsigned int temperature, bool wait = false, int tool = -1) const;
     std::string set_bed_temperature(int temperature, bool wait = false);
     std::string set_chamber_temperature(int temperature, bool wait = false);
-    std::string set_dual_print_mode(DualExtruderMode mode, GCodeFlavor flavor, bool is_single_head);
+    std::string set_dual_print_mode(DualPrintMode mode, GCodeFlavor flavor, bool is_single_head);
     std::string set_print_acceleration(unsigned int acceleration)   { return set_acceleration_internal(Acceleration::Print, acceleration); }
     std::string set_travel_acceleration(unsigned int acceleration)  { return set_acceleration_internal(Acceleration::Travel, acceleration); }
     std::string set_jerk_xy(double jerk);

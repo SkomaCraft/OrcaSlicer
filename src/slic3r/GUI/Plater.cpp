@@ -356,6 +356,8 @@ struct Sidebar::priv
     StaticBox* m_search_bar = nullptr;
     Search::SearchObjectDialog* dia = nullptr;
 
+    //Dual Mode widgetes
+
     // BBS printer config
     StaticBox* m_panel_printer_title = nullptr;
     ScalableButton* m_printer_icon = nullptr;
@@ -827,21 +829,57 @@ Sidebar::Sidebar(Plater *parent)
         bed_type_sizer->Add(m_bed_type_list, 1, wxLEFT | wxEXPAND, FromDIP(SidebarProps::ElementSpacing()));
         bed_type_sizer->AddSpacer(FromDIP(SidebarProps::ContentMargin()));
         vsizer_printer->Add(bed_type_sizer, 0, wxEXPAND | wxTOP, FromDIP(5));
-        vsizer_printer->AddSpacer(FromDIP(16));
+        
 
         auto& project_config = wxGetApp().preset_bundle->project_config;
-        /*const t_config_enum_values* keys_map = print_config_def.get("curr_bed_type")->enum_keys_map;
-        BedType bed_type = btCount;
-        for (auto item : *keys_map) {
-            if (item.first == str_bed_type)
-                bed_type = (BedType)item.second;
-        }*/
+
         BedType bed_type = (BedType)bed_type_value;
         project_config.set_key_value("curr_bed_type", new ConfigOptionEnum<BedType>(bed_type));
 
         p->m_panel_printer_content->SetSizer(vsizer_printer);
         p->m_panel_printer_content->Layout();
         scrolled_sizer->Add(p->m_panel_printer_content, 0, wxEXPAND, 0);
+      
+
+
+
+        //Dual print mode
+        wxBoxSizer*    dual_mode_sizer = new wxBoxSizer(wxHORIZONTAL);
+        dual_mode_title = new wxStaticText(p->m_panel_printer_content, wxID_ANY, _L("Dual mode"));
+        dual_mode_title->Wrap(-1);
+        dual_mode_title->SetFont(Label::Body_14);
+
+        m_dual_mode_list = new ComboBox(p->m_panel_printer_content, wxID_ANY, wxString(""), wxDefaultPosition, {-1, FromDIP(30)}, 0,
+                                        nullptr, wxCB_READONLY);
+        
+        m_dual_mode_list->Bind(wxEVT_COMBOBOX, [=](wxCommandEvent& evt) {
+            int              selected_index = m_dual_mode_list->GetSelection();
+            int              new_value      = selected_index + 1;
+            DualPrintMode mode           = static_cast<DualPrintMode>(new_value);
+            wxGetApp().preset_bundle->project_config.set_key_value("dual_print_mode", new ConfigOptionEnum<DualPrintMode>(mode));
+        });
+
+
+       
+        const ConfigOptionDef* dual_mode_def = print_config_def.get("dual_print_mode");
+        if (dual_mode_def && dual_mode_def->enum_keys_map) {
+            for (auto item : dual_mode_def->enum_labels) {
+                m_dual_mode_list->AppendString(_L(item));
+            }
+        }
+        
+
+       
+        m_dual_mode_list->Select(0);
+        dual_mode_sizer->Add(dual_mode_title, 0, wxLEFT | wxALIGN_CENTER_VERTICAL, FromDIP(SidebarProps::ContentMargin()));
+        dual_mode_sizer->Add(m_dual_mode_list, 1, wxLEFT | wxEXPAND, FromDIP(SidebarProps::ElementSpacing()));
+        dual_mode_sizer->AddSpacer(FromDIP(SidebarProps::ContentMargin()));
+        vsizer_printer->Add(dual_mode_sizer, 0, wxEXPAND | wxTOP, FromDIP(5));
+
+
+
+        vsizer_printer->AddSpacer(FromDIP(16));
+
     }
 
     {
@@ -1261,6 +1299,7 @@ void Sidebar::remove_unused_filament_combos(const size_t current_extruder_count)
         else if (c0 > c1)
             sizer_filaments1->AddStretchSpacer(1);
     }
+
 }
 
 void Sidebar::update_all_preset_comboboxes()
@@ -1339,6 +1378,18 @@ void Sidebar::update_all_preset_comboboxes()
         BedType bed_type = preset_bundle.printers.get_edited_preset().get_default_bed_type(&preset_bundle);
         m_bed_type_list->SelectAndNotify((int) bed_type - 1);
         m_bed_type_list->Disable();
+    }
+
+    //dual mode
+    if (cfg.opt_enum<GCodeFlavor>("gcode_flavor") == gcfCraftbot)
+    {
+        m_dual_mode_list->Show();
+        dual_mode_title->Show();
+    }
+    else
+    {
+        m_dual_mode_list->Hide();
+        dual_mode_title->Hide();
     }
 
     // Update the print choosers to only contain the compatible presets, update the dirty flags.
@@ -1727,6 +1778,13 @@ void Sidebar::on_bed_type_change(BedType bed_type)
     int sel_idx = (int)bed_type - 1;
     if (m_bed_type_list != nullptr)
         m_bed_type_list->SetSelection(sel_idx);
+}
+
+void Sidebar::on_dual_mode_change(DualPrintMode mode)
+{
+    int sel_idx =(int)mode -1;
+    if (m_dual_mode_list != nullptr)
+        m_dual_mode_list->SetSelection(sel_idx);
 }
 
 std::map<int, DynamicPrintConfig> Sidebar::build_filament_ams_list(MachineObject* obj)
