@@ -85,6 +85,10 @@ bool Print::invalidate_state_by_config_options(const ConfigOptionResolver & /* n
         "printable_area",
         //BBS: add bed_exclude_area
         "bed_exclude_area",
+        "bed_exclude_area_left_mode",
+        "bed_exclude_area_right_mode",
+        "bed_exclude_area_mirror_mode",
+        "bed_exclude_area_parallel_mode",
         "thumbnail_size",
         "before_layer_change_gcode",
         "enable_pressure_advance",

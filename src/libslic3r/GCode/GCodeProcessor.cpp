@@ -833,8 +833,36 @@ void GCodeProcessor::apply_config(const DynamicPrintConfig& config)
     if (printable_area != nullptr)
         m_result.printable_area = make_counter_clockwise(printable_area->values);
 
+
     //BBS: add bed_exclude_area
-    const ConfigOptionPoints* bed_exclude_area = config.option<ConfigOptionPoints>("bed_exclude_area");
+    const ConfigOptionPoints* bed_exclude_area;
+    if (m_flavor == gcfCraftbot)
+    {
+        auto mode= config.opt_enum<DualPrintMode>("dual_print_mode");
+        switch(mode)
+        { 
+            case DualPrintMode::Normal:
+            {
+                bed_exclude_area = config.option<ConfigOptionPoints>("bed_exclude_area");
+            }
+            case DualPrintMode::Mirror:
+            {
+                bed_exclude_area = config.option<ConfigOptionPoints>("bed_exclude_area_mirror_mode");
+            }
+            case DualPrintMode::Parallel: {
+                bed_exclude_area = config.option<ConfigOptionPoints>("bed_exclude_area_parallel_mode");
+            }
+            default:
+            {
+                bed_exclude_area = config.option<ConfigOptionPoints>("bed_exclude_area");
+            }
+        }
+    }
+    else
+    {
+        bed_exclude_area = config.option<ConfigOptionPoints>("bed_exclude_area");
+    }
+
     if (bed_exclude_area != nullptr)
         m_result.bed_exclude_area = bed_exclude_area->values;
 

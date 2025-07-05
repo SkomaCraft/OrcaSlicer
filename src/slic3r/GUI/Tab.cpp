@@ -918,7 +918,15 @@ void TabPrinter::init_options_list()
 
     for (const std::string& opt_key : m_config->keys())
     {
-        if (opt_key == "printable_area" || opt_key == "bed_exclude_area" || opt_key == "thumbnails") {
+        if (opt_key == "printable_area"                 ||
+            opt_key == "bed_exclude_area"               ||
+            opt_key == "thumbnails"                     ||         
+            opt_key == "bed_exclude_area_left_mode"     ||
+            opt_key == "bed_exclude_area_right_mode"    ||
+            opt_key == "bed_exclude_area_mirror_mode"   ||
+            opt_key == "bed_exclude_area_parallel_mode"            
+            ) 
+        {
             m_options_list.emplace(opt_key, m_opt_status_value);
             continue;
         }
@@ -3822,6 +3830,24 @@ void TabPrinter::build_fff()
         Option option = optgroup->get_option("bed_exclude_area");
         option.opt.full_width = true;
         optgroup->append_single_option_line(option);
+        //Craftbot Specific
+
+        option                = optgroup->get_option("bed_exclude_area_left_mode");
+        option.opt.full_width = true;
+        optgroup->append_single_option_line(option);
+ 
+        option                = optgroup->get_option("bed_exclude_area_right_mode");
+        option.opt.full_width = true;
+        optgroup->append_single_option_line(option);
+
+        option         = optgroup->get_option("bed_exclude_area_mirror_mode");
+        option.opt.full_width = true;
+        optgroup->append_single_option_line(option);
+
+        option                = optgroup->get_option("bed_exclude_area_parallel_mode");
+        option.opt.full_width = true;
+        optgroup->append_single_option_line(option);
+
         // optgroup->append_single_option_line("printable_area");
         optgroup->append_single_option_line("printable_height");
         optgroup->append_single_option_line("support_multi_bed_types","bed-types");

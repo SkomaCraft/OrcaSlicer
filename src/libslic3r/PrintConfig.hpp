@@ -1229,6 +1229,10 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionPoints,             printable_area))
     //BBS: add bed_exclude_area
     ((ConfigOptionPoints,             bed_exclude_area))
+    ((ConfigOptionPoints,             bed_exclude_area_left_mode))
+    ((ConfigOptionPoints,             bed_exclude_area_right_mode))
+    ((ConfigOptionPoints,             bed_exclude_area_mirror_mode))
+    ((ConfigOptionPoints,             bed_exclude_area_parallel_mode))
     ((ConfigOptionPoints,             head_wrap_detect_zone))
     // BBS
     ((ConfigOptionString,             bed_custom_texture))

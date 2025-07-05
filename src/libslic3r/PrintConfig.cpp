@@ -500,6 +500,38 @@ void PrintConfigDef::init_common_params()
     def->gui_type = ConfigOptionDef::GUIType::one_string;
     def->set_default_value(new ConfigOptionPoints{ Vec2d(0, 0) });
 
+    def = this->add("bed_exclude_area_left_mode", coPoints);
+    def->label = L("Exclude area left mode");
+    def->tooltip = L("Unprintable area in XY plane."
+        "The area is expressed as polygon by points in following format: \"XxY, XxY, ...\"");
+    def->mode = comAdvanced;
+    def->gui_type = ConfigOptionDef::GUIType::one_string;
+    def->set_default_value(new ConfigOptionPoints{ Vec2d(0, 0) });
+
+    def = this->add("bed_exclude_area_right_mode", coPoints);
+    def->label = L("Exclude area right mode");
+    def->tooltip = L("Unprintable area in XY plane."
+        "The area is expressed as polygon by points in following format: \"XxY, XxY, ...\"");
+    def->mode = comAdvanced;
+    def->gui_type = ConfigOptionDef::GUIType::one_string;
+    def->set_default_value(new ConfigOptionPoints{ Vec2d(0, 0) });
+
+    def           = this->add("bed_exclude_area_mirror_mode", coPoints);
+    def->label    = L("Exclude area mirror mode");
+    def->tooltip  = L("Unprintable area in XY plane."
+                       "The area is expressed as polygon by points in following format: \"XxY, XxY, ...\"");
+    def->mode     = comAdvanced;
+    def->gui_type = ConfigOptionDef::GUIType::one_string;
+    def->set_default_value(new ConfigOptionPoints{Vec2d(0, 0)});
+
+    def           = this->add("bed_exclude_area_parallel_mode", coPoints);
+    def->label    = L("Exclude area parallel mode");
+    def->tooltip  = L("Unprintable area in XY plane."
+                       "The area is expressed as polygon by points in following format: \"XxY, XxY, ...\"");
+    def->mode     = comAdvanced;
+    def->gui_type = ConfigOptionDef::GUIType::one_string;
+    def->set_default_value(new ConfigOptionPoints{Vec2d(0, 0)});
+
     def = this->add("bed_custom_texture", coString);
     def->label = L("Bed custom texture");
     def->mode = comAdvanced;
